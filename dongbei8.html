@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>东北地区重要天气预报</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a5f7a 0%, #2a9d8f 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .legend {
+            padding: 10px 30px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+            font-size: 12px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 6px;
+        }
+        
+        /* 终端区颜色图例 - 添加全宽灰色背景 */
+        .terminal-legend-container {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .terminal-legend {
+            padding: 10px 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .terminal-legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 12px;
+            font-size: 12px;
+        }
+        
+        .terminal-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 6px;
+            border: 1px solid #ddd;
+        }
+        
+        .terminal-coverage-0 { background-color: #2196F3; } /* 蓝色 0-20% */
+        .terminal-coverage-1 { background-color: #4CAF50; } /* 绿色 20-40% */
+        .terminal-coverage-2 { background-color: #FFEB3B; } /* 黄色 40-60% */
+        .terminal-coverage-3 { background-color: #FF9800; } /* 橙色 60-80% */
+        .terminal-coverage-4 { background-color: #F44336; } /* 红色 80-100% */
+        
+        /* 航路图例 - 添加全宽灰色背景和整行样式 */
+        .route-legend-container {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .route-legend {
+            padding: 10px 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        /* 航路雷雨整行灰色背景 */
+        .route-legend .legend-item {
+            background-color: transparent;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+        }
+        
+        .gantt-container {
+            padding: 0 5px 20px; /* 修改：减少左右padding，使滑动条紧贴 */
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .gantt-table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1000px;
+        }
+        
+        .gantt-table th, .gantt-table td {
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            height: 40px;
+        }
+        
+        /* 时间行样式 */
+        .gantt-table thead th {
+            background-color: #f2f6fc;
+            font-weight: 600;
+            color: #555;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            border-left: none;
+            border-right: none;
+            position: relative;
+        }
+        
+        /* 时间行第一个单元格保持正常位置 */
+        .gantt-table thead th:first-child {
+            border-left: 1px solid #ddd;
+        }
+        
+        /* 时间行最后一个单元格保留边框 */
+        .gantt-table thead th:last-child {
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 关键修改：00时加粗 */
+        .hour-00 .hour-label {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .hour-00 .date-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 机场行样式 - 保持完整边框 */
+        .gantt-table tbody td {
+            border: 1px solid #ddd;
+        }
+        
+        /* 关键修改：机场行第一列 - 使用粘性定位和transform实现向左偏移 */
+        .airport-name-cell {
+            min-width: 120px;
+            max-width: 120px;
+            width: 120px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 0; /* 从0开始 */
+            z-index: 5;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            /* 使用transform实现向左偏移 */
+            transform: translateX(-25px);
+        }
+        
+        /* 关键修改：为机场名称单元格添加额外宽度，确保滚动时完全显示 */
+        .airport-name-cell::after {
+            content: '';
+            position: absolute;
+            right: -25px;
+            top: 0;
+            bottom: 0;
+            width: 25px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 时间行第一列保持正常位置 */
+        .airport-name-header {
+            min-width: 120px;
+            max-width: 120px;
+            width: 120px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 0;
+            z-index: 15;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 终端区名称单元格 */
+        .terminal-name-cell {
+            min-width: 120px;
+            max-width: 120px;
+            width: 120px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 0; /* 从0开始 */
+            z-index: 5;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            /* 使用transform实现向左偏移 */
+            transform: translateX(-25px);
+        }
+        
+        /* 关键修改：为终端区名称单元格添加额外宽度，确保滚动时完全显示 */
+        .terminal-name-cell::after {
+            content: '';
+            position: absolute;
+            right: -25px;
+            top: 0;
+            bottom: 0;
+            width: 25px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 终端区表头第一列保持正常位置 */
+        .terminal-name-header {
+            min-width: 120px;
+            max-width: 120px;
+            width: 120px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 0;
+            z-index: 15;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 航路区域单元格 */
+        .route-area-cell {
+            min-width: 120px;
+            max-width: 120px;
+            width: 120px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 0; /* 从0开始 */
+            z-index: 5;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            /* 使用transform实现向左偏移 */
+            transform: translateX(-25px);
+        }
+        
+        /* 关键修改：为航路区域单元格添加额外宽度，确保滚动时完全显示 */
+        .route-area-cell::after {
+            content: '';
+            position: absolute;
+            right: -25px;
+            top: 0;
+            bottom: 0;
+            width: 25px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 航路区域表头第一列保持正常位置 */
+        .route-area-header {
+            min-width: 120px;
+            max-width: 120px;
+            width: 120px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 0;
+            z-index: 15;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 航路名称单元格 */
+        .route-name-cell {
+            min-width: 200px;
+            max-width: 200px;
+            width: 200px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 120px; /* 在区域单元格右侧 */
+            z-index: 5;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            text-align: left !important;
+            padding-left: 15px !important;
+            /* 使用transform实现向左偏移 */
+            transform: translateX(-25px);
+        }
+        
+        /* 关键修改：为航路名称单元格添加额外宽度，确保滚动时完全显示 */
+        .route-name-cell::after {
+            content: '';
+            position: absolute;
+            right: -25px;
+            top: 0;
+            bottom: 0;
+            width: 25px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+        
+        /* 航路名称表头第二列保持正常位置 */
+        .route-name-header {
+            min-width: 200px;
+            max-width: 200px;
+            width: 200px;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 120px;
+            z-index: 15;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            text-align: left !important;
+            padding-left: 15px !important;
+        }
+        
+        /* 时间列 - 固定宽度 */
+        .time-header-cell, .time-cell {
+            min-width: 50px;
+            max-width: 50px;
+            width: 50px;
+            box-sizing: border-box;
+        }
+        
+        /* 关键修改：将整个表体向右偏移半格 */
+        .gantt-table tbody {
+            position: relative;
+            left: 25px; /* 向右偏移半格 */
+        }
+        
+        /* 关键修改：时间行表格中线（下四分之一） */
+        .time-header-cell::after {
+            content: '';
+            position: absolute;
+            left: 50%; /* 从单元格中线开始 */
+            bottom: 0;
+            height: 12px; /* 高度的四分之一 */
+            width: 1px;
+            background-color: #ddd;
+            z-index: 2;
+            transform: translateX(-50%);
+        }
+        
+        /* 关键修改：完全删除日期分隔线（包括23时和00时之间的所有线） */
+        .day-separator::before,
+        .day-separator::after {
+            display: none !important;
+        }
+        
+        /* 关键修改：只在日期标签下方显示细线表示日期分隔 */
+        .day-separator {
+            position: relative;
+        }
+        
+        /* 在日期标签下方显示细线 */
+        .day-separator .date-label {
+            position: relative;
+        }
+        
+        .day-separator .date-label::after {
+            content: '';
+            position: absolute;
+            left: -10px;
+            right: -10px;
+            bottom: -2px;
+            height: 1px;
+            background-color: #999;
+        }
+        
+        /* 机场行的日期分隔线 */
+        .airport-day-separator {
+            border-left: 2px solid #999 !important;
+        }
+        
+        /* 机场行样式 */
+        .airport-row {
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        
+        .airport-row:hover {
+            background-color: #f9f9f9;
+        }
+        
+        /* 终端区行样式 */
+        .terminal-row {
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        
+        .terminal-row:hover {
+            background-color: #f9f9f9;
+        }
+        
+        /* 航路行样式 */
+        .route-row {
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        
+        .route-row:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .time-cell {
+            height: 40px;
+            position: relative;
+            padding: 2px;
+            overflow: visible !important;
+        }
+        
+        /* 天气事件样式 */
+        .weather-event {
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: 2;
+            cursor: default;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            opacity: 0.85;
+        }
+        
+        .weather-event:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            z-index: 3;
+            opacity: 1;
+        }
+        
+        /* 关键修改：事件条块从单元格最左侧开始 */
+        .weather-event {
+            left: 0;
+            box-sizing: border-box;
+        }
+        
+        /* 天气类型颜色 */
+        .heavy-rain {
+            background-color: rgba(46, 125, 50, 0.8); /* 深绿 - 中到大雨 */
+            border: 1px solid rgba(46, 125, 50, 0.9);
+        }
+        
+        .light-rain {
+            background-color: rgba(102, 187, 106, 0.8); /* 浅绿 - 小到中雨 */
+            border: 1px solid rgba(102, 187, 106, 0.9);
+        }
+        
+        .strong-thunder-rain {
+            background-color: rgba(211, 47, 47, 0.8); /* 正常红色 - 中到大雨伴CB/雷暴 */
+            border: 1px solid rgba(211, 47, 47, 0.9);
+        }
+        
+        .light-thunder-rain {
+            background-color: rgba(244, 67, 54, 0.8); /* 浅红 - 小到中雨伴CB/雷暴 */
+            border: 1px solid rgba(244, 67, 54, 0.9);
+        }
+        
+        .strong-wind {
+            background-color: rgba(141, 110, 99, 0.8); /* 棕色 - 大风 */
+            border: 1px solid rgba(141, 110, 99, 0.9);
+        }
+        
+        /* 航路预报特定样式 - 雷雨用带有透明度的红色 */
+        .route-thunder {
+            background-color: rgba(220, 53, 69, 0.65) !important; /* 透明红色 - 航路雷雨 */
+            border: 1px solid rgba(220, 53, 69, 0.8) !important;
+        }
+        
+        .time-header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 2px;
+            height: 100%;
+        }
+        
+        .date-label {
+            font-size: 10px;
+            color: #777;
+            margin-bottom: 2px;
+        }
+        
+        .hour-label {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        /* 终端区预报部分样式 */
+        .terminal-section {
+            padding: 0;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        /* 航路预报部分样式 */
+        .route-section {
+            padding: 0;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .route-table-container {
+            overflow-x: auto;
+            position: relative;
+            padding: 0 5px 20px; /* 修改：使滑动条紧贴 */
+        }
+        
+        /* 终端区单元格样式 */
+        .terminal-cell {
+            height: 40px;
+            position: relative;
+            padding: 2px;
+            overflow: hidden !important;
+        }
+        
+        .terminal-grid-container {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border: 1px solid #000;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            background-color: transparent;
+        }
+        
+        .terminal-sector {
+            position: relative;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            background-color: transparent;
+            overflow: hidden;
+        }
+        
+        /* 移除最后一个的右边框和下边框 */
+        .terminal-sector:nth-child(1),
+        .terminal-sector:nth-child(3) {
+            border-right: 1px solid #000;
+        }
+        
+        .terminal-sector:nth-child(1),
+        .terminal-sector:nth-child(2) {
+            border-bottom: 1px solid #000;
+        }
+        
+        .terminal-sector:nth-child(2),
+        .terminal-sector:nth-child(4) {
+            border-right: none;
+        }
+        
+        .terminal-sector:nth-child(3),
+        .terminal-sector:nth-child(4) {
+            border-bottom: none;
+        }
+        
+        /* 中间的黑色圆点 */
+        .terminal-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background-color: #000;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        
+        .terminal-sector-coverage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.7;
+            z-index: 1;
+        }
+        
+        /* 终端区覆盖率颜色 */
+        .coverage-0-20 { background-color: #2196F3; } /* 蓝色 */
+        .coverage-20-40 { background-color: #4CAF50; } /* 绿色 */
+        .coverage-40-60 { background-color: #FFEB3B; } /* 黄色 */
+        .coverage-60-80 { background-color: #FF9800; } /* 橙色 */
+        .coverage-80-100 { background-color: #F44336; } /* 红色 */
+        
+        .footer {
+            padding: 15px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #eee;
+            background-color: #f8f9fa;
+        }
+        
+        .event-label {
+            padding: 0 4px;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .gantt-table th, .gantt-table td {
+                padding: 6px 2px;
+                font-size: 11px;
+                height: 35px;
+            }
+            
+            .time-header-cell, .time-cell {
+                min-width: 40px;
+                max-width: 40px;
+                width: 40px;
+            }
+            
+            .airport-name-header, .airport-name-cell,
+            .terminal-name-header, .terminal-name-cell,
+            .route-area-header, .route-area-cell {
+                min-width: 100px;
+                max-width: 100px;
+                width: 100px;
+            }
+            
+            .route-name-header, .route-name-cell {
+                min-width: 150px;
+                max-width: 150px;
+                width: 150px;
+                left: 100px;
+            }
+            
+            /* 移动端调整偏移量 */
+            .airport-name-cell,
+            .terminal-name-cell,
+            .route-area-cell,
+            .route-name-cell {
+                transform: translateX(-20px); /* 移动端半格偏移 (40px/2) */
+            }
+            
+            .airport-name-cell::after,
+            .terminal-name-cell::after,
+            .route-area-cell::after,
+            .route-name-cell::after {
+                right: -20px;
+                width: 20px;
+            }
+            
+            .gantt-table tbody {
+                left: 20px; /* 移动端半格偏移 (40px/2) */
+            }
+            
+            .weather-event {
+                font-size: 9px;
+            }
+            
+            /* 移动端调整时间行中线高度 */
+            .time-header-cell::after {
+                height: 10px;
+            }
+            
+            /* 移动端调整图例边距 */
+            .terminal-legend,
+            .route-legend {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>东北地区重要天气预报</h1>
+            <div class="subtitle">预报时段：2025年7月20日08时 - 7月21日12时 | 制作时间：2025年7月19日16时00分</div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color heavy-rain"></div>
+                <span>中到大雨</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color light-rain"></div>
+                <span>小到中雨</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color strong-thunder-rain"></div>
+                <span>中到大雨伴CB/雷暴</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color light-thunder-rain"></div>
+                <span>小到中雨伴CB/雷暴</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color strong-wind"></div>
+                <span>大风</span>
+            </div>
+        </div>
+        
+        <div class="gantt-container">
+            <table class="gantt-table">
+                <thead id="time-header-row">
+                    <!-- 时间表头由JavaScript生成 -->
+                </thead>
+                <tbody id="gantt-body">
+                    <!-- 机场行由JavaScript生成 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 新增终端区预报部分 -->
+        <div class="terminal-section">
+            <div class="terminal-legend-container">
+                <div class="terminal-legend">
+                    <div class="terminal-legend-item">
+                        <div class="terminal-color terminal-coverage-0"></div>
+                        <span>覆盖率 0-20%</span>
+                    </div>
+                    <div class="terminal-legend-item">
+                        <div class="terminal-color terminal-coverage-1"></div>
+                        <span>覆盖率 20-40%</span>
+                    </div>
+                    <div class="terminal-legend-item">
+                        <div class="terminal-color terminal-coverage-2"></div>
+                        <span>覆盖率 40-60%</span>
+                    </div>
+                    <div class="terminal-legend-item">
+                        <div class="terminal-color terminal-coverage-3"></div>
+                        <span>覆盖率 60-80%</span>
+                    </div>
+                    <div class="terminal-legend-item">
+                        <div class="terminal-color terminal-coverage-4"></div>
+                        <span>覆盖率 80-100%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gantt-container">
+                <table class="gantt-table">
+                    <thead id="terminal-time-header-row">
+                        <!-- 终端区时间表头由JavaScript生成 -->
+                    </thead>
+                    <tbody id="terminal-table-body">
+                        <!-- 终端区行由JavaScript生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 新增航路预报部分 -->
+        <div class="route-section">
+            <div class="route-legend-container">
+                <div class="route-legend">
+                    <div class="legend-item">
+                        <div class="legend-color route-thunder" style="background-color: rgba(220, 53, 69, 0.65);"></div>
+                        <span>航路雷雨</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gantt-container">
+                <table class="gantt-table">
+                    <thead id="route-time-header-row">
+                        <!-- 航路时间表头由JavaScript生成 -->
+                    </thead>
+                    <tbody id="route-table-body">
+                        <!-- 航路行由JavaScript生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="footer">
+            注：颜色条块表示重要天气现象发生时段，空白表示无重要天气 | 基于MDRS重要天气发生概率通报表
+        </div>
+    </div>
+
+    <script>
+        // 更新后的机场天气数据 - 增加长春龙嘉机场
+        const weatherData = [
+            {
+                airport: "哈尔滨太平机场",
+                events: [
+                    { 
+                        type: "strong-wind", 
+                        start: "2025-07-20T08:00", 
+                        end: "2025-07-20T14:00", 
+                        label: "大风",
+                        description: "偏南风8-12米/秒，阵风15-19米/秒"
+                    },
+                    { 
+                        type: "light-thunder-rain", 
+                        start: "2025-07-20T14:00", 
+                        end: "2025-07-20T17:00", 
+                        label: "小到中雨伴CB",
+                        description: "小到中雨伴CB"
+                    }
+                ]
+            },
+            {
+                airport: "长春龙嘉机场",
+                events: [] // 没有重要天气
+            },
+            {
+                airport: "沈阳桃仙机场",
+                events: [
+                    { 
+                        type: "heavy-rain", 
+                        start: "2025-07-20T18:00", 
+                        end: "2025-07-20T22:00", 
+                        label: "中阵雨",
+                        description: "中阵雨"
+                    },
+                    { 
+                        type: "strong-thunder-rain", 
+                        start: "2025-07-21T05:00", 
+                        end: "2025-07-21T09:00", 
+                        label: "中阵雨伴雷暴",
+                        description: "中阵雨伴雷暴"
+                    }
+                ]
+            },
+            {
+                airport: "大连周水子机场",
+                events: [
+                    { 
+                        type: "light-rain", 
+                        start: "2025-07-20T12:00", 
+                        end: "2025-07-20T21:00", 
+                        label: "小到中阵雨",
+                        description: "小到中阵雨"
+                    },
+                    { 
+                        type: "light-thunder-rain", 
+                        start: "2025-07-20T21:00", 
+                        end: "2025-07-21T02:00", 
+                        label: "小到中阵雨伴雷暴",
+                        description: "小到中阵雨伴雷暴"
+                    }
+                ]
+            }
+        ];
+
+        // 终端区预报数据 - 时间后推4小时
+        const terminalData = [
+            {
+                terminal: "哈尔滨终端区",
+                events: [
+                    {
+                        start: "2025-07-20T13:00", // 原09:00改为13:00
+                        end: "2025-07-20T14:00",   // 原10:00改为14:00
+                        sectors: [
+                            { sector: 1, coverage: 30 } // 一区 30%
+                        ]
+                    },
+                    {
+                        start: "2025-07-20T14:00", // 原10:00改为14:00
+                        end: "2025-07-20T15:00",   // 原11:00改为15:00
+                        sectors: [
+                            { sector: 1, coverage: 30 }, // 一区 30%
+                            { sector: 2, coverage: 30 }, // 二区 30%
+                            { sector: 3, coverage: 50 }  // 三区 50%
+                        ]
+                    },
+                    {
+                        start: "2025-07-20T15:00", // 原11:00改为15:00
+                        end: "2025-07-20T16:00",   // 原12:00改为16:00
+                        sectors: [
+                            { sector: 2, coverage: 70 }, // 二区 70%
+                            { sector: 3, coverage: 30 }, // 三区 30%
+                            { sector: 4, coverage: 20 }  // 四区 20%
+                        ]
+                    },
+                    {
+                        start: "2025-07-20T16:00", // 原12:00改为16:00
+                        end: "2025-07-20T17:00",   // 原13:00改为17:00
+                        sectors: [
+                            { sector: 4, coverage: 60 } // 四区 60%
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // 航路预报数据 - 修正区域名称，保持合并
+        const routeData = [
+            {
+                area: "沈阳区管一室",
+                route: "G212航路 OTABO-UKDUM段",
+                events: [
+                    { 
+                        type: "route-thunder", 
+                        start: "2025-07-20T12:00", 
+                        end: "2025-07-20T22:00", 
+                        label: "分散雷雨",
+                        description: "分散雷雨，顶高7至11公里"
+                    }
+                ],
+                rowspan: 2 // 合并两行
+            },
+            {
+                area: "沈阳区管一室",
+                route: "A575航路 朝阳-UKDUM段",
+                events: [
+                    { 
+                        type: "route-thunder", 
+                        start: "2025-07-20T14:00", 
+                        end: "2025-07-21T08:00", 
+                        label: "分散雷雨",
+                        description: "分散雷雨，顶高7至11公里"
+                    }
+                ],
+                rowspan: 0 // 第二行不显示区域
+            },
+            {
+                area: "沈阳区管二室",
+                route: "A588航路 NUBKI-万昌段",
+                events: [
+                    { 
+                        type: "route-thunder", 
+                        start: "2025-07-20T12:00", 
+                        end: "2025-07-20T22:00", 
+                        label: "分散雷雨",
+                        description: "分散雷雨，顶高7至11公里"
+                    }
+                ],
+                rowspan: 2 // 合并两行
+            },
+            {
+                area: "沈阳区管二室",
+                route: "A575航路 BIDIB-朝阳段",
+                events: [
+                    { 
+                        type: "route-thunder", 
+                        start: "2025-07-20T14:00", 
+                        end: "2025-07-21T08:00", 
+                        label: "分散雷雨",
+                        description: "分散雷雨，顶高7至11公里"
+                    }
+                ],
+                rowspan: 0 // 第二行不显示区域
+            },
+            {
+                area: "哈尔滨区域",
+                route: "A588航路 哈尔滨-万昌",
+                events: [
+                    { 
+                        type: "route-thunder", 
+                        start: "2025-07-20T09:00", 
+                        end: "2025-07-20T16:00", 
+                        label: "雷雨/阵雨",
+                        description: "成片阵雨，分散雷雨，顶高7至10公里"
+                    }
+                ],
+                rowspan: 1 // 单独一行
+            }
+        ];
+
+        // 生成时间表头 (7月20日08时 - 7月21日12时)
+        function generateTimeHeaders() {
+            const startDate = new Date("2025-07-20T08:00");
+            const endDate = new Date("2025-07-21T12:00");
+            const headerRow = document.getElementById("time-header-row");
+            
+            // 添加机场名称列
+            const airportHeader = document.createElement("th");
+            airportHeader.textContent = "机场";
+            airportHeader.classList.add("airport-name-header");
+            headerRow.appendChild(airportHeader);
+            
+            // 生成每小时列
+            generateHourCells(startDate, endDate, headerRow);
+        }
+
+        // 生成终端区时间表头
+        function generateTerminalTimeHeaders() {
+            const startDate = new Date("2025-07-20T08:00");
+            const endDate = new Date("2025-07-21T12:00");
+            const headerRow = document.getElementById("terminal-time-header-row");
+            
+            // 添加终端区名称列
+            const terminalHeader = document.createElement("th");
+            terminalHeader.textContent = "终端区";
+            terminalHeader.classList.add("terminal-name-header");
+            headerRow.appendChild(terminalHeader);
+            
+            // 生成每小时列
+            generateHourCells(startDate, endDate, headerRow);
+        }
+
+        // 生成航路时间表头
+        function generateRouteTimeHeaders() {
+            const startDate = new Date("2025-07-20T08:00");
+            const endDate = new Date("2025-07-21T12:00");
+            const headerRow = document.getElementById("route-time-header-row");
+            
+            // 添加区域名称列
+            const areaHeader = document.createElement("th");
+            areaHeader.textContent = "区域";
+            areaHeader.classList.add("route-area-header");
+            headerRow.appendChild(areaHeader);
+            
+            // 添加航路名称列
+            const routeHeader = document.createElement("th");
+            routeHeader.textContent = "航路段";
+            routeHeader.classList.add("route-name-header");
+            headerRow.appendChild(routeHeader);
+            
+            // 生成每小时列
+            generateHourCells(startDate, endDate, headerRow);
+        }
+
+        // 生成小时单元格
+        function generateHourCells(startDate, endDate, headerRow) {
+            let currentTime = new Date(startDate);
+            let lastDate = null;
+            let hourIndex = 0;
+            
+            while (currentTime <= endDate) {
+                const th = document.createElement("th");
+                th.classList.add("time-header-cell");
+                
+                // 格式化时间显示
+                const hour = currentTime.getHours();
+                const date = currentTime.getDate();
+                const month = currentTime.getMonth() + 1;
+                const currentDateStr = `${month}-${date}`;
+                
+                // 检查是否是新的日期，添加分隔线
+                if (lastDate !== currentDateStr && lastDate !== null) {
+                    th.classList.add("day-separator");
+                }
+                lastDate = currentDateStr;
+                
+                // 如果是00时，添加特殊类
+                if (hour === 0) {
+                    th.classList.add("hour-00");
+                }
+                
+                th.innerHTML = `
+                    <div class="time-header">
+                        <div class="date-label">${month}/${date}</div>
+                        <div class="hour-label">${hour.toString().padStart(2, '0')}</div>
+                    </div>
+                `;
+                
+                // 设置数据属性以便后续计算
+                th.dataset.hour = hour;
+                th.dataset.date = currentDateStr;
+                th.dataset.fullTime = currentTime.toISOString();
+                th.dataset.hourIndex = hourIndex;
+                
+                headerRow.appendChild(th);
+                
+                // 增加1小时
+                currentTime.setHours(currentTime.getHours() + 1);
+                hourIndex++;
+            }
+        }
+
+        // 生成机场行和天气事件
+        function generateAirportRows() {
+            const tbody = document.getElementById("gantt-body");
+            const startDate = new Date("2025-07-20T08:00");
+            const endDate = new Date("2025-07-21T12:00");
+            
+            weatherData.forEach(airportData => {
+                const row = document.createElement("tr");
+                row.classList.add("airport-row");
+                
+                // 机场名称单元格
+                const airportCell = document.createElement("td");
+                airportCell.textContent = airportData.airport;
+                airportCell.classList.add("airport-name-cell");
+                row.appendChild(airportCell);
+                
+                // 生成时间单元格
+                let currentTime = new Date(startDate);
+                let hourIndex = 0;
+                let lastDateStr = null;
+                
+                while (currentTime <= endDate) {
+                    const cell = document.createElement("td");
+                    cell.classList.add("time-cell");
+                    cell.dataset.hourIndex = hourIndex;
+                    cell.dataset.time = currentTime.toISOString();
+                    
+                    // 检查是否是新的日期，为机场行添加分隔线
+                    const date = currentTime.getDate();
+                    const month = currentTime.getMonth() + 1;
+                    const currentDateStr = `${month}-${date}`;
+                    
+                    if (lastDateStr !== currentDateStr && lastDateStr !== null) {
+                        cell.classList.add("airport-day-separator");
+                    }
+                    lastDateStr = currentDateStr;
+                    
+                    row.appendChild(cell);
+                    currentTime.setHours(currentTime.getHours() + 1);
+                    hourIndex++;
+                }
+                
+                tbody.appendChild(row);
+            });
+            
+            // 在所有行创建后，再添加天气事件
+            addWeatherEvents();
+        }
+
+        // 生成终端区行
+        function generateTerminalRows() {
+            const tbody = document.getElementById("terminal-table-body");
+            const startDate = new Date("2025-07-20T08:00");
+            const endDate = new Date("2025-07-21T12:00");
+            
+            terminalData.forEach(terminalItem => {
+                const row = document.createElement("tr");
+                row.classList.add("terminal-row"); // 添加类以支持悬停效果
+                
+                // 终端区名称单元格
+                const terminalCell = document.createElement("td");
+                terminalCell.textContent = terminalItem.terminal;
+                terminalCell.classList.add("terminal-name-cell");
+                row.appendChild(terminalCell);
+                
+                // 生成时间单元格（终端区专用）
+                let currentTime = new Date(startDate);
+                let hourIndex = 0;
+                let lastDateStr = null;
+                
+                while (currentTime <= endDate) {
+                    const cell = document.createElement("td");
+                    cell.classList.add("terminal-cell");
+                    cell.dataset.hourIndex = hourIndex;
+                    cell.dataset.time = currentTime.toISOString();
+                    
+                    // 检查是否是新的日期，为行添加分隔线
+                    const date = currentTime.getDate();
+                    const month = currentTime.getMonth() + 1;
+                    const currentDateStr = `${month}-${date}`;
+                    
+                    if (lastDateStr !== currentDateStr && lastDateStr !== null) {
+                        cell.classList.add("airport-day-separator");
+                    }
+                    lastDateStr = currentDateStr;
+                    
+                    // 创建终端区四等分网格
+                    const gridContainer = document.createElement("div");
+                    gridContainer.classList.add("terminal-grid-container");
+                    
+                    // 创建四个扇区
+                    for (let i = 1; i <= 4; i++) {
+                        const sectorDiv = document.createElement("div");
+                        sectorDiv.classList.add("terminal-sector");
+                        sectorDiv.dataset.sector = i;
+                        sectorDiv.dataset.hourIndex = hourIndex;
+                        
+                        // 添加覆盖率显示
+                        const coverageDiv = document.createElement("div");
+                        coverageDiv.classList.add("terminal-sector-coverage");
+                        coverageDiv.dataset.sector = i;
+                        coverageDiv.dataset.hourIndex = hourIndex;
+                        
+                        sectorDiv.appendChild(coverageDiv);
+                        gridContainer.appendChild(sectorDiv);
+                    }
+                    
+                    // 添加中间黑色圆点
+                    const centerDot = document.createElement("div");
+                    centerDot.classList.add("terminal-center-dot");
+                    gridContainer.appendChild(centerDot);
+                    
+                    cell.appendChild(gridContainer);
+                    row.appendChild(cell);
+                    
+                    currentTime.setHours(currentTime.getHours() + 1);
+                    hourIndex++;
+                }
+                
+                tbody.appendChild(row);
+            });
+            
+            // 在所有行创建后，再添加终端区天气事件
+            addTerminalEvents();
+        }
+
+        // 生成航路行
+        function generateRouteRows() {
+            const tbody = document.getElementById("route-table-body");
+            const startDate = new Date("2025-07-20T08:00");
+            const endDate = new Date("2025-07-21T12:00");
+            
+            routeData.forEach((routeItem, index) => {
+                const row = document.createElement("tr");
+                row.classList.add("route-row"); // 添加类以支持悬停效果
+                
+                // 区域名称单元格 - 根据rowspan决定是否显示
+                if (routeItem.rowspan > 0) {
+                    const areaCell = document.createElement("td");
+                    areaCell.textContent = routeItem.area;
+                    areaCell.classList.add("route-area-cell");
+                    areaCell.rowSpan = routeItem.rowspan;
+                    areaCell.style.verticalAlign = "middle";
+                    row.appendChild(areaCell);
+                }
+                
+                // 航路名称单元格
+                const routeCell = document.createElement("td");
+                routeCell.textContent = routeItem.route;
+                routeCell.classList.add("route-name-cell");
+                row.appendChild(routeCell);
+                
+                // 生成时间单元格
+                let currentTime = new Date(startDate);
+                let hourIndex = 0;
+                let lastDateStr = null;
+                
+                while (currentTime <= endDate) {
+                    const cell = document.createElement("td");
+                    cell.classList.add("time-cell");
+                    cell.dataset.hourIndex = hourIndex;
+                    cell.dataset.time = currentTime.toISOString();
+                    
+                    // 检查是否是新的日期，为行添加分隔线
+                    const date = currentTime.getDate();
+                    const month = currentTime.getMonth() + 1;
+                    const currentDateStr = `${month}-${date}`;
+                    
+                    if (lastDateStr !== currentDateStr && lastDateStr !== null) {
+                        cell.classList.add("airport-day-separator");
+                    }
+                    lastDateStr = currentDateStr;
+                    
+                    row.appendChild(cell);
+                    currentTime.setHours(currentTime.getHours() + 1);
+                    hourIndex++;
+                }
+                
+                tbody.appendChild(row);
+            });
+            
+            // 在所有行创建后，再添加航路天气事件
+            addRouteEvents();
+        }
+
+        // 添加天气事件到机场表格
+        function addWeatherEvents() {
+            const startDate = new Date("2025-07-20T08:00");
+            
+            weatherData.forEach((airportData, airportIndex) => {
+                const row = document.querySelectorAll('.airport-row')[airportIndex];
+                
+                airportData.events.forEach(event => {
+                    const eventStart = new Date(event.start);
+                    const eventEnd = new Date(event.end);
+                    
+                    // 计算事件开始和结束的小时索引
+                    const startHourIndex = getHourDifference(startDate, eventStart);
+                    const endHourIndex = getHourDifference(startDate, eventEnd);
+                    
+                    // 计算事件跨越的小时数
+                    const durationHours = endHourIndex - startHourIndex;
+                    
+                    // 找到事件开始的单元格
+                    const startCell = row.querySelector(`td[data-hour-index="${startHourIndex}"]`);
+                    
+                    if (startCell) {
+                        addEventToCell(startCell, event, durationHours, airportData.airport, eventStart, eventEnd);
+                    }
+                });
+            });
+        }
+
+        // 添加终端区事件
+        function addTerminalEvents() {
+            const startDate = new Date("2025-07-20T08:00");
+            
+            terminalData.forEach((terminalItem, terminalIndex) => {
+                const row = document.querySelectorAll('#terminal-table-body tr')[terminalIndex];
+                
+                terminalItem.events.forEach(event => {
+                    const eventStart = new Date(event.start);
+                    const eventEnd = new Date(event.end);
+                    
+                    // 计算事件开始和结束的小时索引
+                    const startHourIndex = getHourDifference(startDate, eventStart);
+                    const endHourIndex = getHourDifference(startDate, eventEnd);
+                    
+                    // 对事件期间的每个小时添加终端区覆盖
+                    for (let hourIndex = startHourIndex; hourIndex < endHourIndex; hourIndex++) {
+                        const cell = row.querySelector(`td[data-hour-index="${hourIndex}"]`);
+                        if (cell) {
+                            event.sectors.forEach(sector => {
+                                const coverageDiv = cell.querySelector(`.terminal-sector-coverage[data-sector="${sector.sector}"][data-hour-index="${hourIndex}"]`);
+                                if (coverageDiv) {
+                                    // 根据覆盖率设置颜色类
+                                    let coverageClass = '';
+                                    if (sector.coverage <= 20) {
+                                        coverageClass = 'coverage-0-20';
+                                    } else if (sector.coverage <= 40) {
+                                        coverageClass = 'coverage-20-40';
+                                    } else if (sector.coverage <= 60) {
+                                        coverageClass = 'coverage-40-60';
+                                    } else if (sector.coverage <= 80) {
+                                        coverageClass = 'coverage-60-80';
+                                    } else {
+                                        coverageClass = 'coverage-80-100';
+                                    }
+                                    
+                                    coverageDiv.classList.add(coverageClass);
+                                    coverageDiv.title = `终端区${getSectorChineseName(sector.sector)} - 覆盖率: ${sector.coverage}%`;
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        // 获取扇区中文名称
+        function getSectorChineseName(sectorNumber) {
+            const names = ['', '一区', '二区', '三区', '四区'];
+            return names[sectorNumber] || sectorNumber + '区';
+        }
+
+        // 添加天气事件到航路表格
+        function addRouteEvents() {
+            const startDate = new Date("2025-07-20T08:00");
+            
+            routeData.forEach((routeItem, routeIndex) => {
+                const row = document.querySelectorAll('#route-table-body tr')[routeIndex];
+                
+                if (routeItem.events && routeItem.events.length > 0) {
+                    routeItem.events.forEach(event => {
+                        const eventStart = new Date(event.start);
+                        const eventEnd = new Date(event.end);
+                        
+                        // 计算事件开始和结束的小时索引
+                        const startHourIndex = getHourDifference(startDate, eventStart);
+                        const endHourIndex = getHourDifference(startDate, eventEnd);
+                        
+                        // 计算事件跨越的小时数
+                        const durationHours = endHourIndex - startHourIndex;
+                        
+                        // 找到事件开始的单元格（注意：航路表前两列是区域和航路名称）
+                        const startCell = row.querySelector(`td[data-hour-index="${startHourIndex}"]`);
+                        
+                        if (startCell) {
+                            addEventToCell(startCell, event, durationHours, `${routeItem.area} ${routeItem.route}`, eventStart, eventEnd);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 添加事件到单元格的通用函数
+        function addEventToCell(cell, event, durationHours, location, eventStart, eventEnd) {
+            const eventElement = document.createElement("div");
+            eventElement.classList.add("weather-event", event.type);
+            
+            // 检查是否是航路事件，添加相应类
+            if (event.type === "route-thunder") {
+                eventElement.classList.add("route-event");
+            }
+            
+            // 获取当前单元格的实际宽度
+            const cellWidth = cell.offsetWidth;
+            
+            // 计算事件宽度（跨越的小时数 * 单元格宽度）
+            const width = durationHours * cellWidth;
+            
+            // 事件条块从单元格最左侧开始
+            eventElement.style.width = `${width}px`;
+            eventElement.style.left = '0';
+            
+            // 添加事件标签
+            const labelSpan = document.createElement("span");
+            labelSpan.classList.add("event-label");
+            labelSpan.textContent = event.label;
+            eventElement.appendChild(labelSpan);
+            
+            // 设置标题提示
+            eventElement.title = `${location}\n${event.description}\n时间: ${formatTime(eventStart)}-${formatTime(eventEnd)}`;
+            
+            cell.appendChild(eventElement);
+        }
+
+        // 计算两个时间之间的小时差
+        function getHourDifference(startTime, endTime) {
+            return Math.round((endTime - startTime) / (1000 * 60 * 60));
+        }
+
+        // 格式化时间显示
+        function formatTime(date) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTimeHeaders();
+            generateAirportRows();
+            generateTerminalTimeHeaders();
+            generateTerminalRows();
+            generateRouteTimeHeaders();
+            generateRouteRows();
+        });
+
+        // 监听窗口大小变化，重新计算事件条宽度
+        window.addEventListener('resize', function() {
+            // 重新添加天气事件以更新宽度
+            setTimeout(() => {
+                const existingEvents = document.querySelectorAll('.weather-event');
+                existingEvents.forEach(event => event.remove());
+                addWeatherEvents();
+                addRouteEvents();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
