@@ -66,7 +66,75 @@
             margin-right: 6px;
         }
         
-        /* 终端区颜色图例 - 添加全宽灰色背景 */
+        /* MDRS表格图片容器样式 */
+        .mdrs-image-container {
+            padding: 20px 30px;
+            background-color: #fff;
+            border-top: 1px solid #eaeaea;
+            text-align: center;
+        }
+        
+        .mdrs-image-container h3 {
+            color: #1a5f7a;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+            text-align: left;
+        }
+        
+        .mdrs-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+        
+        .image-caption {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        /* 纯文字描述样式 */
+        .forecast-description {
+            padding: 20px 30px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eaeaea;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+        
+        .forecast-description h3 {
+            color: #1a5f7a;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+        }
+        
+        .forecast-description p {
+            margin-bottom: 12px;
+            color: #444;
+        }
+        
+        .forecast-description .section-title {
+            font-weight: 600;
+            color: #2a9d8f;
+            margin: 20px 0 10px 0;
+            font-size: 14px;
+        }
+        
+        .forecast-description .airport-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 终端区颜色图例 */
         .terminal-legend-container {
             background-color: #f8f9fa;
             border-bottom: 1px solid #eaeaea;
@@ -100,7 +168,7 @@
         .terminal-coverage-3 { background-color: #FF9800; } /* 橙色 60-80% */
         .terminal-coverage-4 { background-color: #F44336; } /* 红色 80-100% */
         
-        /* 航路图例 - 添加全宽灰色背景和整行样式 */
+        /* 航路图例 */
         .route-legend-container {
             background-color: #f8f9fa;
             border-bottom: 1px solid #eaeaea;
@@ -113,16 +181,8 @@
             gap: 12px;
         }
         
-        /* 航路雷雨整行灰色背景 */
-        .route-legend .legend-item {
-            background-color: transparent;
-            padding: 0;
-            border: none;
-            border-radius: 0;
-        }
-        
         .gantt-container {
-            padding: 0 5px 20px; /* 修改：减少左右padding，使滑动条紧贴 */
+            padding: 0 5px 20px;
             overflow-x: auto;
             position: relative;
         }
@@ -156,17 +216,15 @@
             position: relative;
         }
         
-        /* 时间行第一个单元格保持正常位置 */
         .gantt-table thead th:first-child {
             border-left: 1px solid #ddd;
         }
         
-        /* 时间行最后一个单元格保留边框 */
         .gantt-table thead th:last-child {
             border-right: 1px solid #ddd;
         }
         
-        /* 关键修改：00时加粗 */
+        /* 00时加粗 */
         .hour-00 .hour-label {
             font-weight: 700;
             color: #333;
@@ -177,12 +235,11 @@
             color: #333;
         }
         
-        /* 机场行样式 - 保持完整边框 */
+        /* 机场行样式 */
         .gantt-table tbody td {
             border: 1px solid #ddd;
         }
         
-        /* 关键修改：机场行第一列 - 使用粘性定位和transform实现向左偏移 */
         .airport-name-cell {
             min-width: 120px;
             max-width: 120px;
@@ -190,15 +247,13 @@
             background-color: #f8f9fa;
             font-weight: 600;
             position: sticky;
-            left: 0; /* 从0开始 */
+            left: 0;
             z-index: 5;
             border-left: 1px solid #ddd;
             border-right: 1px solid #ddd;
-            /* 使用transform实现向左偏移 */
             transform: translateX(-25px);
         }
         
-        /* 关键修改：为机场名称单元格添加额外宽度，确保滚动时完全显示 */
         .airport-name-cell::after {
             content: '';
             position: absolute;
@@ -232,15 +287,13 @@
             background-color: #f8f9fa;
             font-weight: 600;
             position: sticky;
-            left: 0; /* 从0开始 */
+            left: 0;
             z-index: 5;
             border-left: 1px solid #ddd;
             border-right: 1px solid #ddd;
-            /* 使用transform实现向左偏移 */
             transform: translateX(-25px);
         }
         
-        /* 关键修改：为终端区名称单元格添加额外宽度，确保滚动时完全显示 */
         .terminal-name-cell::after {
             content: '';
             position: absolute;
@@ -252,7 +305,7 @@
             border-right: 1px solid #ddd;
         }
         
-        /* 终端区表头第一列保持正常位置 */
+        /* 终端区表头第一列 */
         .terminal-name-header {
             min-width: 120px;
             max-width: 120px;
@@ -274,15 +327,13 @@
             background-color: #f8f9fa;
             font-weight: 600;
             position: sticky;
-            left: 0; /* 从0开始 */
+            left: 0;
             z-index: 5;
             border-left: 1px solid #ddd;
             border-right: 1px solid #ddd;
-            /* 使用transform实现向左偏移 */
             transform: translateX(-25px);
         }
         
-        /* 关键修改：为航路区域单元格添加额外宽度，确保滚动时完全显示 */
         .route-area-cell::after {
             content: '';
             position: absolute;
@@ -294,7 +345,7 @@
             border-right: 1px solid #ddd;
         }
         
-        /* 航路区域表头第一列保持正常位置 */
+        /* 航路区域表头第一列 */
         .route-area-header {
             min-width: 120px;
             max-width: 120px;
@@ -316,17 +367,15 @@
             background-color: #f8f9fa;
             font-weight: 600;
             position: sticky;
-            left: 120px; /* 在区域单元格右侧 */
+            left: 120px;
             z-index: 5;
             border-left: 1px solid #ddd;
             border-right: 1px solid #ddd;
             text-align: left !important;
             padding-left: 15px !important;
-            /* 使用transform实现向左偏移 */
             transform: translateX(-25px);
         }
         
-        /* 关键修改：为航路名称单元格添加额外宽度，确保滚动时完全显示 */
         .route-name-cell::after {
             content: '';
             position: absolute;
@@ -338,7 +387,7 @@
             border-right: 1px solid #ddd;
         }
         
-        /* 航路名称表头第二列保持正常位置 */
+        /* 航路名称表头第二列 */
         .route-name-header {
             min-width: 200px;
             max-width: 200px;
@@ -362,32 +411,32 @@
             box-sizing: border-box;
         }
         
-        /* 关键修改：将整个表体向右偏移半格 */
+        /* 将整个表体向右偏移半格 */
         .gantt-table tbody {
             position: relative;
-            left: 25px; /* 向右偏移半格 */
+            left: 25px;
         }
         
-        /* 关键修改：时间行表格中线（下四分之一） */
+        /* 时间行表格中线 */
         .time-header-cell::after {
             content: '';
             position: absolute;
-            left: 50%; /* 从单元格中线开始 */
+            left: 50%;
             bottom: 0;
-            height: 12px; /* 高度的四分之一 */
+            height: 12px;
             width: 1px;
             background-color: #ddd;
             z-index: 2;
             transform: translateX(-50%);
         }
         
-        /* 关键修改：完全删除日期分隔线（包括23时和00时之间的所有线） */
+        /* 删除日期分隔线 */
         .day-separator::before,
         .day-separator::after {
             display: none !important;
         }
         
-        /* 关键修改：只在日期标签下方显示细线表示日期分隔 */
+        /* 只在日期标签下方显示细线表示日期分隔 */
         .day-separator {
             position: relative;
         }
@@ -476,7 +525,7 @@
             opacity: 1;
         }
         
-        /* 关键修改：事件条块从单元格最左侧开始 */
+        /* 事件条块从单元格最左侧开始 */
         .weather-event {
             left: 0;
             box-sizing: border-box;
@@ -484,33 +533,33 @@
         
         /* 天气类型颜色 */
         .heavy-rain {
-            background-color: rgba(46, 125, 50, 0.8); /* 深绿 - 中到大雨 */
+            background-color: rgba(46, 125, 50, 0.8);
             border: 1px solid rgba(46, 125, 50, 0.9);
         }
         
         .light-rain {
-            background-color: rgba(102, 187, 106, 0.8); /* 浅绿 - 小到中雨 */
+            background-color: rgba(102, 187, 106, 0.8);
             border: 1px solid rgba(102, 187, 106, 0.9);
         }
         
         .strong-thunder-rain {
-            background-color: rgba(211, 47, 47, 0.8); /* 正常红色 - 中到大雨伴CB/雷暴 */
+            background-color: rgba(211, 47, 47, 0.8);
             border: 1px solid rgba(211, 47, 47, 0.9);
         }
         
         .light-thunder-rain {
-            background-color: rgba(244, 67, 54, 0.8); /* 浅红 - 小到中雨伴CB/雷暴 */
+            background-color: rgba(244, 67, 54, 0.8);
             border: 1px solid rgba(244, 67, 54, 0.9);
         }
         
         .strong-wind {
-            background-color: rgba(141, 110, 99, 0.8); /* 棕色 - 大风 */
+            background-color: rgba(141, 110, 99, 0.8);
             border: 1px solid rgba(141, 110, 99, 0.9);
         }
         
         /* 航路预报特定样式 - 雷雨用带有透明度的红色 */
         .route-thunder {
-            background-color: rgba(220, 53, 69, 0.65) !important; /* 透明红色 - 航路雷雨 */
+            background-color: rgba(220, 53, 69, 0.65) !important;
             border: 1px solid rgba(220, 53, 69, 0.8) !important;
         }
         
@@ -548,7 +597,7 @@
         .route-table-container {
             overflow-x: auto;
             position: relative;
-            padding: 0 5px 20px; /* 修改：使滑动条紧贴 */
+            padding: 0 5px 20px;
         }
         
         /* 终端区单元格样式 */
@@ -686,7 +735,7 @@
             .terminal-name-cell,
             .route-area-cell,
             .route-name-cell {
-                transform: translateX(-20px); /* 移动端半格偏移 (40px/2) */
+                transform: translateX(-20px);
             }
             
             .airport-name-cell::after,
@@ -698,7 +747,7 @@
             }
             
             .gantt-table tbody {
-                left: 20px; /* 移动端半格偏移 (40px/2) */
+                left: 20px;
             }
             
             .weather-event {
@@ -714,6 +763,25 @@
             .terminal-legend,
             .route-legend {
                 padding: 10px 20px;
+            }
+            
+            /* 移动端调整MDRS图片和描述文字 */
+            .mdrs-image-container,
+            .forecast-description {
+                padding: 15px 20px;
+            }
+            
+            .mdrs-image-container h3,
+            .forecast-description h3 {
+                font-size: 15px;
+            }
+            
+            .forecast-description .section-title {
+                font-size: 13px;
+            }
+            
+            .image-caption {
+                font-size: 11px;
             }
         }
     </style>
@@ -759,7 +827,7 @@
             </table>
         </div>
         
-        <!-- 新增终端区预报部分 -->
+        <!-- 终端区预报部分 -->
         <div class="terminal-section">
             <div class="terminal-legend-container">
                 <div class="terminal-legend">
@@ -798,7 +866,7 @@
             </div>
         </div>
         
-        <!-- 新增航路预报部分 -->
+        <!-- 航路预报部分 -->
         <div class="route-section">
             <div class="route-legend-container">
                 <div class="route-legend">
@@ -821,13 +889,42 @@
             </div>
         </div>
         
+        <!-- MDRS表格图片部分 -->
+        <div class="mdrs-image-container">
+            <h3>MDRS 重要天气发生概率通报表</h3>
+            <!-- 设置图片路径 -->
+            <img src="dongbeimdrs.png" alt="MDRS重要天气发生概率通报表" class="mdrs-image">
+            <div class="image-caption">图：东北地区MDRS重要天气发生概率通报表（2025年7月19日16时00分制作）</div>
+        </div>
+        
+        <!-- 文字描述部分（已更新，按照哈尔滨、长春、沈阳、大连的顺序） -->
+        <div class="forecast-description">
+            <h3>详细天气描述</h3>
+            
+            <p>受高空槽影响，预计在东北地区将有分散至成片的中等强度对流云发展，呈块状和带状，东西至东北-西南走向，顶高7至11千米，整体向东至东南方向移动，移速约40至60公里/小时，强度维持或略有增强，主要影响时段为7月20日上午至21日上午。</p>
+            
+            <div class="section-title">机场预报：</div>
+            <p><span class="airport-name">哈尔滨太平机场：</span> 20日08-14时，大风，偏南风8-12米/秒，阵风15-19米/秒；20日14-17时，小到中雨伴CB</p>
+            <p><span class="airport-name">长春龙嘉机场：</span> 预报时段内无重要天气</p>
+            <p><span class="airport-name">沈阳桃仙机场：</span> 20日18-22时，中阵雨；21日05-09时，中阵雨伴雷暴</p>
+            <p><span class="airport-name">大连周水子机场：</span> 20日12-21时，小到中阵雨；20日21时-21日02时，小到中阵雨伴雷暴</p>
+            
+            <div class="section-title">终端区预报：</div>
+            <p><span class="airport-name">哈尔滨终端区：</span> 终端区一区，20日13-15时，分散雷雨，顶高7至10公里，覆盖率30%；终端区二区，20日14-16时，分散雷雨，顶高7至10公里，其中14-15时覆盖率30%，15-16时覆盖率70%；终端区三区，20日14-16时，分散雷雨，顶高7至10公里，其中14-15时覆盖率50%，15-16时覆盖率30%；终端区四区，20日15-17时，分散雷雨，顶高7至10公里，其中15-16时覆盖率20%，16-17时覆盖率60%。</p>
+            
+            <div class="section-title">航路预报：</div>
+            <p><span class="airport-name">沈阳区管一室：</span> G212航路OTABO至UKDUM段，20日12时至22时，分散雷雨，顶高7至11公里；A575航路朝阳至UKDUM段，20日14时至21日08时，分散雷雨，顶高7至11公里</p>
+            <p><span class="airport-name">沈阳区管二室：</span> A588航路NUBKI至万昌段，20日12时至22时，分散雷雨，顶高7至11公里；A575航路BIDIB至朝阳段，20日14时至21日08时，分散雷雨，顶高7至11公里</p>
+            <p><span class="airport-name">哈尔滨区域：</span> A588航路哈尔滨至万昌，20日9时至16时，成片阵雨，分散雷雨，顶高7至10公里</p>
+        </div>
+        
         <div class="footer">
             注：颜色条块表示重要天气现象发生时段，空白表示无重要天气 | 基于MDRS重要天气发生概率通报表
         </div>
     </div>
 
     <script>
-        // 更新后的机场天气数据 - 增加长春龙嘉机场
+        // 机场天气数据 - 按照哈尔滨、长春、沈阳、大连的顺序
         const weatherData = [
             {
                 airport: "哈尔滨太平机场",
@@ -892,39 +989,56 @@
             }
         ];
 
-        // 终端区预报数据 - 时间后推4小时
+        // 终端区预报数据
         const terminalData = [
             {
                 terminal: "哈尔滨终端区",
                 events: [
                     {
-                        start: "2025-07-20T13:00", // 原09:00改为13:00
-                        end: "2025-07-20T14:00",   // 原10:00改为14:00
+                        start: "2025-07-20T13:00", // 一区 13-15时
+                        end: "2025-07-20T15:00",
                         sectors: [
                             { sector: 1, coverage: 30 } // 一区 30%
                         ]
                     },
                     {
-                        start: "2025-07-20T14:00", // 原10:00改为14:00
-                        end: "2025-07-20T15:00",   // 原11:00改为15:00
+                        start: "2025-07-20T14:00", // 二区 14-15时
+                        end: "2025-07-20T15:00",
                         sectors: [
-                            { sector: 1, coverage: 30 }, // 一区 30%
-                            { sector: 2, coverage: 30 }, // 二区 30%
-                            { sector: 3, coverage: 50 }  // 三区 50%
+                            { sector: 2, coverage: 30 } // 二区 30%
                         ]
                     },
                     {
-                        start: "2025-07-20T15:00", // 原11:00改为15:00
-                        end: "2025-07-20T16:00",   // 原12:00改为16:00
+                        start: "2025-07-20T15:00", // 二区 15-16时
+                        end: "2025-07-20T16:00",
                         sectors: [
-                            { sector: 2, coverage: 70 }, // 二区 70%
-                            { sector: 3, coverage: 30 }, // 三区 30%
-                            { sector: 4, coverage: 20 }  // 四区 20%
+                            { sector: 2, coverage: 70 } // 二区 70%
                         ]
                     },
                     {
-                        start: "2025-07-20T16:00", // 原12:00改为16:00
-                        end: "2025-07-20T17:00",   // 原13:00改为17:00
+                        start: "2025-07-20T14:00", // 三区 14-15时
+                        end: "2025-07-20T15:00",
+                        sectors: [
+                            { sector: 3, coverage: 50 } // 三区 50%
+                        ]
+                    },
+                    {
+                        start: "2025-07-20T15:00", // 三区 15-16时
+                        end: "2025-07-20T16:00",
+                        sectors: [
+                            { sector: 3, coverage: 30 } // 三区 30%
+                        ]
+                    },
+                    {
+                        start: "2025-07-20T15:00", // 四区 15-16时
+                        end: "2025-07-20T16:00",
+                        sectors: [
+                            { sector: 4, coverage: 20 } // 四区 20%
+                        ]
+                    },
+                    {
+                        start: "2025-07-20T16:00", // 四区 16-17时
+                        end: "2025-07-20T17:00",
                         sectors: [
                             { sector: 4, coverage: 60 } // 四区 60%
                         ]
@@ -933,7 +1047,7 @@
             }
         ];
 
-        // 航路预报数据 - 修正区域名称，保持合并
+        // 航路预报数据
         const routeData = [
             {
                 area: "沈阳区管一室",
@@ -947,7 +1061,7 @@
                         description: "分散雷雨，顶高7至11公里"
                     }
                 ],
-                rowspan: 2 // 合并两行
+                rowspan: 2
             },
             {
                 area: "沈阳区管一室",
@@ -961,7 +1075,7 @@
                         description: "分散雷雨，顶高7至11公里"
                     }
                 ],
-                rowspan: 0 // 第二行不显示区域
+                rowspan: 0
             },
             {
                 area: "沈阳区管二室",
@@ -975,7 +1089,7 @@
                         description: "分散雷雨，顶高7至11公里"
                     }
                 ],
-                rowspan: 2 // 合并两行
+                rowspan: 2
             },
             {
                 area: "沈阳区管二室",
@@ -989,7 +1103,7 @@
                         description: "分散雷雨，顶高7至11公里"
                     }
                 ],
-                rowspan: 0 // 第二行不显示区域
+                rowspan: 0
             },
             {
                 area: "哈尔滨区域",
@@ -1003,7 +1117,7 @@
                         description: "成片阵雨，分散雷雨，顶高7至10公里"
                     }
                 ],
-                rowspan: 1 // 单独一行
+                rowspan: 1
             }
         ];
 
@@ -1166,7 +1280,7 @@
             
             terminalData.forEach(terminalItem => {
                 const row = document.createElement("tr");
-                row.classList.add("terminal-row"); // 添加类以支持悬停效果
+                row.classList.add("terminal-row");
                 
                 // 终端区名称单元格
                 const terminalCell = document.createElement("td");
@@ -1243,7 +1357,7 @@
             
             routeData.forEach((routeItem, index) => {
                 const row = document.createElement("tr");
-                row.classList.add("route-row"); // 添加类以支持悬停效果
+                row.classList.add("route-row");
                 
                 // 区域名称单元格 - 根据rowspan决定是否显示
                 if (routeItem.rowspan > 0) {
@@ -1393,7 +1507,7 @@
                         // 计算事件跨越的小时数
                         const durationHours = endHourIndex - startHourIndex;
                         
-                        // 找到事件开始的单元格（注意：航路表前两列是区域和航路名称）
+                        // 找到事件开始的单元格
                         const startCell = row.querySelector(`td[data-hour-index="${startHourIndex}"]`);
                         
                         if (startCell) {
